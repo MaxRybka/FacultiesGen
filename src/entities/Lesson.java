@@ -71,6 +71,27 @@ public class Lesson {
     public void setStudents(Student[] students) {
         this.students = students;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder strbd = new StringBuilder();
+
+        strbd.append("Subject : ").append(subject.toString());
+        strbd.append("\nTeacher : ").append(teacher.toString());
+        strbd.append("\nClassroom : ").append(classroom.toString());
+        strbd.append("\nTime : ").append(time);
+        strbd.append("\nIs Practice : ").append(isPractice);
+        strbd.append("\nStudents : ");
+
+        for (Student student:
+             students) {
+            strbd.append(student.toString()).append(",");
+        }
+        strbd.setCharAt(strbd.length()-1, ' ');
+
+        return strbd.toString();
+
+    }
 }
 
 
