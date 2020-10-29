@@ -12,9 +12,10 @@ public class Lesson {
 
     private String weekday;
 
+    private Student[] students;
+
     private boolean isPractice;
 
-    private Student[] students;
 
     public Subject getSubject() {
         return subject;

@@ -1,3 +1,6 @@
+package GenAlgorithm;
+
+import entities.Constants;
 import entities.Lesson;
 import entities.Student;
 import entities.Subject;
@@ -43,11 +46,11 @@ public class Chromosome {
         genome = new Lesson[Schedule.GENES_COUNT];
         int counter = 0;
 
-        for (int i=0; i < Schedule.SUBJECTS.length;i++){
-            genome[counter++] = fillLesson(Schedule.SUBJECTS[i], false);
+        for (int i=0; i < Constants.SUBJECTS.length;i++){
+            genome[counter++] = fillLesson(Constants.SUBJECTS[i], false);
 
-            for (int j = 0; j < Schedule.SUBJECTS[i].getPracticesAmount(); j++) {
-                genome[counter++] =fillLesson(Schedule.SUBJECTS[i], true);
+            for (int j = 0; j < Constants.SUBJECTS[i].getPracticesAmount(); j++) {
+                genome[counter++] =fillLesson(Constants.SUBJECTS[i], true);
             }
         }
 
@@ -96,12 +99,13 @@ public class Chromosome {
         lesson.setSubject(subject);
         lesson.setPractice(isPractice);
 
-        lesson.setTime(Schedule.TIMES[Schedule.getRandomInt(0,Schedule.TIMES.length-1)]);
-        lesson.setWeekday(Schedule.WEEKDAYS[Schedule.getRandomInt(0,Schedule.WEEKDAYS.length-1)]);
+        lesson.setTime(Constants.TIMES[Schedule.getRandomInt(0,Constants.TIMES.length-1)]);
+        lesson.setWeekday(Constants.WEEKDAYS[Schedule.getRandomInt(0,Constants.WEEKDAYS.length-1)]);
+        lesson.setClassroom(Constants.CLASSROOMS[Schedule.getRandomInt(0,Constants.CLASSROOMS.length-1)]);
+
 
         lesson.setTeacher(isPractice ? subject.getPracticeTeachers()[Schedule.getRandomInt(0,subject.getPracticeTeachers().length-1)] : subject.getLector());
 
-        lesson.setClassroom(Schedule.CLASSROOMS[Schedule.getRandomInt(0,Schedule.CLASSROOMS.length-1)]);
         if(!isPractice)
             lesson.setStudents(subject.getStudents());
         else{
