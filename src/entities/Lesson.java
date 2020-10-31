@@ -1,5 +1,7 @@
 package entities;
 
+import java.util.List;
+
 public class Lesson {
 
     private Subject subject;

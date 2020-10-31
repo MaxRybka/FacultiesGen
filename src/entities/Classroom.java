@@ -36,14 +36,14 @@ public class Classroom {
         /* Check if o is an instance of Pair or not
           "null instanceof [type]" also returns false */
         if (!(obj instanceof Classroom)) {
-            return false;
-        }
+        return false;
+    }
 
-        // typecast o to Complex so that we can compare data members
-        Classroom classroom = (Classroom) obj;
+    // typecast o to Complex so that we can compare data members
+    Classroom classroom = (Classroom) obj;
 
         return this.number == classroom.number;
-    }
+}
 
     @Override
     public String toString() {
