@@ -1,6 +1,4 @@
-package CSPAlgorithms;
-
-import entities.Classroom;
+package entities;
 
 public class SchedulingUnit {
     private Classroom classroom;

@@ -1,7 +1,9 @@
 package CSPAlgorithms;
 
 
-public class Power extends MRV {
+import entities.VariantLesson;
+
+public class POW extends MRV {
 
     @Override
     protected VariantLesson findBestLesson(){

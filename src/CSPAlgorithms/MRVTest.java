@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class MRVTest {
 
-    private static final int TEST_AMOUNT = 20000;
+    private static final int TEST_AMOUNT = 10000;
 
     @Test
     public void findLessons() {
@@ -17,13 +17,14 @@ public class MRVTest {
 
         for (int c = 0; c < TEST_AMOUNT; c++) {
 
-            //MRV mrv = new MRV();
-            //LCV mrv = new LCV();
-            Power mrv = new Power();
+            //MRV main = new MRV();
+            //
+            // POW main = new POW();
+            //LCV main = new LCV();
+            CP main = new CP();
+            main.findLessons();
 
-            mrv.findLessons();
-
-            ArrayList<Lesson> res = mrv.getResLessons();
+            ArrayList<Lesson> res = main.getResLessons();
             for (int i = 0; i < res.size(); i++) {
                 for (int j = 0; j < res.size(); j++) {
                     if (i == j) continue;

@@ -1,5 +1,8 @@
 package CSPAlgorithms;
 
+import entities.SchedulingUnit;
+import entities.VariantLesson;
+
 public class LCV extends MRV{
 
     @Override

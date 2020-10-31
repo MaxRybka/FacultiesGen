@@ -1,6 +1,4 @@
-package CSPAlgorithms;
-
-import entities.*;
+package entities;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +15,7 @@ public class VariantLesson {
 
     private ArrayList<SchedulingUnit> schedulingUnits;
 
-    private ArrayList<VariantLesson> neighbors;
+    private ArrayList<VariantLesson> neighbours;
 
     private ArrayList<Student> students ;
 
@@ -37,7 +35,7 @@ public class VariantLesson {
                 }
             }
         }
-        this.neighbors = new ArrayList<>();
+        this.neighbours = new ArrayList<>();
         this.students= new ArrayList<>(Arrays.asList(subject.getStudents()));
     }
 
@@ -65,33 +63,30 @@ public class VariantLesson {
         }
     }
 
-    public void removeUnits(SchedulingUnit schedulingUnit){
-        ArrayList<SchedulingUnit> schedulingUnits1= (ArrayList<SchedulingUnit>)schedulingUnits.clone();
-        for (SchedulingUnit cUnit:schedulingUnits1) {
+    public boolean removeUnits(SchedulingUnit schedulingUnit){
+        ArrayList<SchedulingUnit> schedulingUnits1 = (ArrayList<SchedulingUnit>)schedulingUnits.clone();
+        for (SchedulingUnit cUnit:schedulingUnits) {
             if (cUnit.getTime().equals(schedulingUnit.getTime()) && cUnit.getWeekday().equals(schedulingUnit.getWeekday()))
-                schedulingUnits.remove(cUnit);
+                schedulingUnits1.remove(cUnit);
         }
+        if (schedulingUnits1.size()==0)return false;
+        schedulingUnits = schedulingUnits1;
+        return true;
     }
+
+    public boolean checkUnits(SchedulingUnit schedulingUnit){
+        for (SchedulingUnit cUnit:schedulingUnits) {
+            return(!cUnit.getTime().equals(schedulingUnit.getTime()) || !cUnit.getWeekday().equals(schedulingUnit.getWeekday()));
+        }
+        return false;
+    }
+
 
 
     public void removeFromNeighbors(){
-        for (VariantLesson neighbor:this.neighbors) {
+        for (VariantLesson neighbor:this.neighbours) {
             neighbor.getNeighbors().remove(this);
         }
-    }
-
-    public int countAffectedUnits(VariantLesson variantLesson){
-        int counter = 0;
-        for (SchedulingUnit su1:this.schedulingUnits) {
-            for (SchedulingUnit su2:variantLesson.getSchedulingUnits()) {
-                if (this.getTeacher().equals(variantLesson.getTeacher()) || this.containsStudents(variantLesson.getStudents())) {
-                    if (su1.getTime().equals(su2.getTime()) && su1.getWeekday().equals(su2.getWeekday()))
-                        counter++;
-                }
-                else if (su1.equals(su2))counter++;
-            }
-        }
-        return counter;
     }
 
 
@@ -137,11 +132,11 @@ public class VariantLesson {
 
 
     public ArrayList<VariantLesson> getNeighbors() {
-        return neighbors;
+        return neighbours;
     }
 
     public void setNeighbors(ArrayList<VariantLesson> neighbors) {
-        this.neighbors = neighbors;
+        this.neighbours = neighbors;
     }
 
     public int getId() {

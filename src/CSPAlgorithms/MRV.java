@@ -27,11 +27,15 @@ public class MRV {
     }
 
     public void findLessons(){
-        
+        preprocessing();
         getResultLesson(variantLessons.get(0));
         for (int i = 1; i < lessons_count; i++) {
             getResultLesson(findBestLesson());
         }
+    }
+
+    protected void preprocessing(){
+
     }
 
 
@@ -46,12 +50,36 @@ public class MRV {
        return varLes.getSchedulingUnits().get(getRandomInt(0,varLes.getSchedulingUnits().size()-1));
     }
 
+    protected SchedulingUnit findValidSchedulingUnit(VariantLesson varLes){
+        SchedulingUnit schedulingUnit = findSchedulingUnit(varLes);
+        boolean notValid = true;
+        while(notValid){
+            notValid=false;
+            //delete and check if empty intersections from neighbours
+            for (VariantLesson vl : varLes.getNeighbors()) {
+                if(!vl.removeUnits(schedulingUnit)){
+                    notValid=true;
+                    varLes.getSchedulingUnits().remove(schedulingUnit);
+                    schedulingUnit = findSchedulingUnit(varLes);
+                    break;
+                };
+            }
+        }
+        return schedulingUnit;
+    }
+
+    protected void removeBadUnits(VariantLesson varLes,SchedulingUnit schedulingUnit){
+
+        //delete exact scheduling Unit from all variant lessons
+        for (VariantLesson vl : variantLessons)
+            vl.getSchedulingUnits().remove(schedulingUnit);
+    }
+
     private void getResultLesson(VariantLesson varLes){
+        SchedulingUnit schedulingUnit = findValidSchedulingUnit(varLes);
         Lesson les= new Lesson();
         les.setSubject(varLes.getSubject());
         les.setTeacher(varLes.getTeacher());
-
-        SchedulingUnit schedulingUnit =findSchedulingUnit(varLes);
         les.setPractice(varLes.isPractice());
         les.setTime(schedulingUnit.getTime());
         les.setWeekday(schedulingUnit.getWeekday());
@@ -62,16 +90,7 @@ public class MRV {
         varLes.removeFromNeighbors();
         variantLessons.remove(varLes);
 
-        //delete intersections from neighbours
-        for (VariantLesson vl : varLes.getNeighbors()) {
-            if (vl.getTeacher().equals(les.getTeacher()) || vl.containsStudents(les.getStudents())) {
-                vl.removeUnits(schedulingUnit);
-            }
-        }
-
-        //delete exact scheduling Unit from all variant lessons
-        for (VariantLesson vl : variantLessons)
-            vl.getSchedulingUnits().remove(schedulingUnit);
+        removeBadUnits(varLes,schedulingUnit);
 
     }
 

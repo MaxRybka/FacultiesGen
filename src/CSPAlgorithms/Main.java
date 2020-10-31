@@ -5,13 +5,15 @@ public class Main {
 //        MRV mrv = new MRV();
 //        mrv.findLessons();
 //        System.out.println("RESULT  MRV:\n" + mrv.toString());
-//        Power power = new Power();
+//        POW power = new POW();
 //        power.findLessons();
 //        System.out.println("RESULT POWER :\n" + power.toString());
 
 //        LCV lcv = new LCV();
 //        lcv.findLessons();
 //        System.out.println("RESULT  LCV:\n" + lcv.toString());
-
+        CP cp = new CP();
+        cp.findLessons();
+        System.out.println("RESULT  LCV:\n" + cp.toString());
     }
 }
