@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class VariantLesson {
+    private int id;
 
     private Subject subject;
 
@@ -20,7 +21,8 @@ public class VariantLesson {
 
     private ArrayList<Student> students ;
 
-    public VariantLesson(Subject subject, Teacher teacher, boolean isPractice) {
+    public VariantLesson(int id,Subject subject, Teacher teacher, boolean isPractice) {
+        this.id  = id;
         this.subject = subject;
         this.teacher = teacher;
         this.isPractice = isPractice;
@@ -35,7 +37,7 @@ public class VariantLesson {
                 }
             }
         }
-
+        this.neighbors = new ArrayList<>();
         this.students= new ArrayList<>(Arrays.asList(subject.getStudents()));
     }
 
@@ -60,7 +62,6 @@ public class VariantLesson {
         for (SchedulingUnit cUnit:schedulingUnits1) {
             if (cUnit.getClassroom().getSeats()<students.size())
                 schedulingUnits.remove(cUnit);
-
         }
     }
 
@@ -71,6 +72,14 @@ public class VariantLesson {
                 schedulingUnits.remove(cUnit);
         }
     }
+
+
+    public void removeFromNeighbors(){
+        for (VariantLesson neighbor:this.neighbors) {
+            neighbor.getNeighbors().remove(this);
+        }
+    }
+
     public int countAffectedUnits(VariantLesson variantLesson){
         int counter = 0;
         for (SchedulingUnit su1:this.schedulingUnits) {
@@ -133,5 +142,31 @@ public class VariantLesson {
 
     public void setNeighbors(ArrayList<VariantLesson> neighbors) {
         this.neighbors = neighbors;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+    @Override
+    public boolean equals(Object obj) {
+        // If the object is compared with itself then return true
+        if (obj == this) {
+            return true;
+        }
+
+        /* Check if o is an instance of Pair or not
+          "null instanceof [type]" also returns false */
+        if (!(obj instanceof VariantLesson)) {
+            return false;
+        }
+
+        // typecast o to Complex so that we can compare data members
+        VariantLesson variantLesson = (VariantLesson) obj;
+
+        return this.id == variantLesson.id;
     }
 }

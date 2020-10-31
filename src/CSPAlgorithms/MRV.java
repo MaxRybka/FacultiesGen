@@ -4,12 +4,13 @@ import GenAlgorithm.Schedule;
 import entities.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
 public class MRV {
 
-    private ArrayList<VariantLesson> variantLessons= new ArrayList<>();
+    protected ArrayList<VariantLesson> variantLessons= new ArrayList<>();
 
     public ArrayList<Lesson> getResLessons() {
         return resLessons;
@@ -26,6 +27,7 @@ public class MRV {
     }
 
     public void findLessons(){
+        
         getResultLesson(variantLessons.get(0));
         for (int i = 1; i < lessons_count; i++) {
             getResultLesson(findBestLesson());
@@ -40,49 +42,51 @@ public class MRV {
     }
 
 
+    protected SchedulingUnit findSchedulingUnit(VariantLesson varLes){
+       return varLes.getSchedulingUnits().get(getRandomInt(0,varLes.getSchedulingUnits().size()-1));
+    }
+
     private void getResultLesson(VariantLesson varLes){
         Lesson les= new Lesson();
         les.setSubject(varLes.getSubject());
         les.setTeacher(varLes.getTeacher());
 
-        SchedulingUnit schedulingUnit = varLes.getSchedulingUnits().get(getRandomInt(0,varLes.getSchedulingUnits().size()-1));
-
+        SchedulingUnit schedulingUnit =findSchedulingUnit(varLes);
         les.setPractice(varLes.isPractice());
         les.setTime(schedulingUnit.getTime());
         les.setWeekday(schedulingUnit.getWeekday());
         les.setClassroom(schedulingUnit.getClassroom());
-        if(!les.isPractice()) {
-            les.setStudents(varLes.getSubject().getStudents());
-        }
-        else les.setStudents(getRandomStudents(varLes,schedulingUnit.getClassroom().getSeats()));
+        les.setStudents(varLes.getStudents().toArray(new Student[varLes.getStudents().size()]));
 
         resLessons.add(les);
+        varLes.removeFromNeighbors();
         variantLessons.remove(varLes);
 
-        for (VariantLesson vl : variantLessons) {
+        //delete intersections from neighbours
+        for (VariantLesson vl : varLes.getNeighbors()) {
             if (vl.getTeacher().equals(les.getTeacher()) || vl.containsStudents(les.getStudents())) {
                 vl.removeUnits(schedulingUnit);
             }
-            vl.getSchedulingUnits().remove(schedulingUnit);
         }
 
-
+        //delete exact scheduling Unit from all variant lessons
+        for (VariantLesson vl : variantLessons)
+            vl.getSchedulingUnits().remove(schedulingUnit);
 
     }
 
 
-    private Student[] getRandomStudents(VariantLesson variantLesson,int seats){
+
+    private Student[] getRandomStudents(int lessonIndex){
+        VariantLesson variantLesson = variantLessons.get(lessonIndex);
         int practiceAm = variantLesson.getSubject().getPracticesAmount();
         int studentsAm = variantLesson.getStudents().size()/practiceAm;
-
-        if(seats <studentsAm)
-            studentsAm=seats-1;
 
         Student[] foundedStudents = new Student[studentsAm];
         for(int i =0; i < studentsAm; i++){
             int index = getRandomInt(0,variantLesson.getStudents().size()-1);
             foundedStudents[i] = variantLesson.getStudents().get(index);
-            deleteStudent(index,variantLesson);
+            deleteStudent(index,lessonIndex);
         }
         decreasePractisesAm(practiceAm-1,variantLesson);
 
@@ -95,18 +99,15 @@ public class MRV {
                 variantLesson1.getSubject().setPracticesAmount(am);
         }
     }
-    private void deleteStudent(int index,VariantLesson variantLesson){
-        for (VariantLesson variantLesson1 : variantLessons) {
-            if (variantLesson1.getSubject().equals(variantLesson.getSubject()) && variantLesson1.isPractice())
-                variantLesson1.getStudents().remove(index);
+
+    private void deleteStudent(int studentindex,int lessonIndex){
+        for (int i = lessonIndex; i < variantLessons.size(); i++) {
+            if (variantLessons.get(i).getSubject().equals(variantLessons.get(lessonIndex).getSubject()) && variantLessons.get(i).isPractice())
+                variantLessons.get(i).getStudents().remove(studentindex);
         }
     }
 
-    private VariantLesson findBestLesson(){
-//        for (VariantLesson variantLesson : variantLessons) {
-//            if (variantLesson.getSchedulingUnits().size() < res.getSchedulingUnits().size()) res = variantLesson;
-//        }
-
+    protected VariantLesson findBestLesson(){
         VariantLesson res  = variantLessons.get(0);
         for (VariantLesson variantLesson : variantLessons) {
             if (variantLesson.getSchedulingUnits().size() < res.getSchedulingUnits().size()) res = variantLesson;
@@ -115,20 +116,47 @@ public class MRV {
     }
 
 
+
     private void createInitialLessons(){
         int counter = 0;
 
+        //create and fill initial lessons with teacher, subject, isPractice
         for (entities.Subject Subject : Constants.SUBJECTS) {
-            variantLessons.add(counter++,new VariantLesson(Subject,
+            VariantLesson varLes = new VariantLesson(counter,Subject,
                     Subject.getLector(),
-                    false));
+                    false);
+            variantLessons.add(counter++,varLes);
             for (int j = 0; j < Subject.getPracticesAmount(); j++) {
-                variantLessons.add(counter++, new VariantLesson(Subject,
-                     Subject.getPracticeTeachers()[Schedule.getRandomInt(0, Subject.getPracticeTeachers().length - 1)],
-                        true));
+                varLes = new VariantLesson(counter,Subject,
+                        Subject.getPracticeTeachers()[Schedule.getRandomInt(0, Subject.getPracticeTeachers().length - 1)],
+                        true);
+                variantLessons.add(counter++, varLes);
             }
         }
+        // fill initial lessons with students and remove scheduling units with not enough seats
+        for (int i = 0; i < variantLessons.size(); i++) {
+            if(!variantLessons.get(i).isPractice()) {
+                variantLessons.get(i).setStudents(new ArrayList<>(Arrays.asList(variantLessons.get(i).getSubject().getStudents())));
+            }
+            else variantLessons.get(i).setStudents(new ArrayList<>(Arrays.asList(getRandomStudents(i))));
+            variantLessons.get(i).removeClassromUnits();
+        }
+
+        //fill neighbours
+        for (int i = 0; i < variantLessons.size(); i++) {
+            for (int j = 0; j < variantLessons.size(); j++) {
+                if (i==j) continue;
+                if (variantLessons.get(i).getTeacher().equals(variantLessons.get(j).getTeacher()) ||
+                        variantLessons.get(i).containsStudents(variantLessons.get(j).getStudents())) {
+                    variantLessons.get(i).getNeighbors().add(variantLessons.get(j));
+                }
+            }
+        }
+
     }
+
+
+
     @Override
     public String toString() {
 
@@ -176,11 +204,6 @@ public class MRV {
         return strbd.toString();
     }
 
-    public static void main(String[] args ) {
-        MRV mrv = new MRV();
-        mrv.findLessons();
 
-        System.out.println("RESULT:\n" + mrv.toString());
-    }
 
 }
